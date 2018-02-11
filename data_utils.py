@@ -128,7 +128,7 @@ def get_data(data_type, data_options=None):
             samples, labels = load_resized_mnist(14)       # this is the 0-2 setting
     elif data_type == 'gp_rbf':
         print(data_options)
-        samples, pdf = GP(**data_options, kernel='rbf')
+        samples, pdf = GP(data_options, kernel='rbf')
     elif data_type == 'linear':
         samples, pdf = linear(**data_options)
     elif data_type == 'eICU_task':
@@ -206,10 +206,10 @@ def split(samples, proportions, normalise=False, scale=False, labels=None, rando
         random.seed(random_seed)
         np.random.seed(random_seed)
     assert np.sum(proportions) == 1
-    n_total = samples.shape[0]
-    n_train = ceil(n_total*proportions[0])
-    n_test = ceil(n_total*proportions[2])
-    n_vali = n_total - (n_train + n_test)
+    n_total = int(samples.shape[0])
+    n_train = int(ceil(n_total*proportions[0]))
+    n_test = int(ceil(n_total*proportions[2]))
+    n_vali = int(n_total - (n_train + n_test))
     # permutation to shuffle the samples
     shuff = np.random.permutation(n_total)
     train_indices = shuff[:n_train]

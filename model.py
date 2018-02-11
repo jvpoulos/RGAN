@@ -9,9 +9,9 @@ from mod_core_rnn_cell_impl import LSTMCell          #modified to allow initiali
 tf.logging.set_verbosity(tf.logging.ERROR)
 import mmd
 
-from differential_privacy.dp_sgd.dp_optimizer import dp_optimizer
-from differential_privacy.dp_sgd.dp_optimizer import sanitizer
-from differential_privacy.privacy_accountant.tf import accountant
+import dp_optimizer
+import sanitizer
+import accountant
 
 # --- to do with latent space --- #
 
@@ -155,13 +155,13 @@ def WGAN_loss(Z, X, WGAN_clip=False):
 def GAN_loss(Z, X, generator_settings, discriminator_settings, kappa, cond, CG, CD, CS, wrong_labels=False):
     if cond:
         # C-GAN
-        G_sample = generator(Z, **generator_settings, c=CG)
-        D_real, D_logit_real =  discriminator(X, **discriminator_settings, c=CD)
-        D_fake, D_logit_fake = discriminator(G_sample, reuse=True, **discriminator_settings, c=CG)
+        G_sample = generator(Z, c=CG, **generator_settings)
+        D_real, D_logit_real =  discriminator(X, c=CD, **discriminator_settings)
+        D_fake, D_logit_fake = discriminator(G_sample, reuse=True, c=CG, **discriminator_settings)
         
         if wrong_labels:
             # the discriminator must distinguish between real data with fake labels and real data with real labels, too
-            D_wrong, D_logit_wrong = discriminator(X, reuse=True, **discriminator_settings, c=CS)
+            D_wrong, D_logit_wrong = discriminator(X, reuse=True, c=CS, **discriminator_settings)
     else:
         # normal GAN
         G_sample = generator(Z, **generator_settings)

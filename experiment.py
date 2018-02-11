@@ -59,7 +59,7 @@ D_loss, G_loss = model.GAN_loss(Z, X, generator_settings, discriminator_settings
 D_solver, G_solver, priv_accountant = model.GAN_solvers(D_loss, G_loss, learning_rate, batch_size, 
         total_examples=samples['train'].shape[0], l2norm_bound=l2norm_bound,
         batches_per_lot=batches_per_lot, sigma=dp_sigma, dp=dp)
-G_sample = model.generator(Z, **generator_settings, reuse=True, c=CG)
+G_sample = model.generator(Z, reuse=True, c=CG, **generator_settings)
 
 # --- evaluation --- #
 
@@ -72,7 +72,7 @@ heuristic_sigma_training = median_pairwise_distance(samples['vali'])
 best_mmd2_so_far = 1000
 
 # optimise sigma using that (that's t-hat)
-batch_multiplier = 5000//batch_size
+batch_multiplier = 2000//batch_size
 eval_size = batch_multiplier*batch_size
 eval_eval_size = int(0.2*eval_size)
 eval_real_PH = tf.placeholder(tf.float32, [eval_eval_size, seq_length, num_generated_features])
@@ -165,7 +165,7 @@ train_settings = dict((k, settings[k]) for k in train_vars)
 
 t0 = time()
 best_epoch = 0
-print('epoch\ttime\tD_loss\tG_loss\tmmd2\tthat\tpdf_sample\tpdf_real')
+print('epoch\ttime\tD_loss\tG_loss')
 for epoch in range(num_epochs):
     D_loss_curr, G_loss_curr = model.train_epoch(epoch, samples['train'], labels['train'],
                                         sess, Z, X, CG, CD, CS,
@@ -185,7 +185,7 @@ for epoch in range(num_epochs):
                 resample_rate_in_min, multivariate_mnist, seq_length, labels=vis_C)
    
     # compute mmd2 and, if available, prob density
-    if epoch % eval_freq == 0:
+    if epoch % eval_freq == -100: # don't calculate mmd2
         ## how many samples to evaluate with?
         eval_Z = model.sample_Z(eval_size, seq_length, latent_dim, use_time)
         if 'eICU_task' in data:
@@ -253,12 +253,12 @@ for epoch in range(num_epochs):
     ## print
     t = time() - t0
     try:
-        print('%d\t%.2f\t%.4f\t%.4f\t%.5f\t%.0f\t%.2f\t%.2f' % (epoch, t, D_loss_curr, G_loss_curr, mmd2, that_np, pdf_sample, pdf_real))
+        print('%d\t%.2f\t%.4f\t%.4f\t' % (epoch, t, D_loss_curr, G_loss_curr))
     except TypeError:       # pdf are missing (format as strings)
-        print('%d\t%.2f\t%.4f\t%.4f\t%.5f\t%.0f\t %s\t %s' % (epoch, t, D_loss_curr, G_loss_curr, mmd2, that_np, pdf_sample, pdf_real))
+        print('%d\t%.2f\t%.4f\t%.4f\t' % (epoch, t, D_loss_curr, G_loss_curr))
 
     ## save trace
-    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr, mmd2, that_np, pdf_sample, pdf_real])) + '\n')
+    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr, mmd2, pdf_sample, pdf_real])) + '\n')
     if epoch % 10 == 0: 
         trace.flush()
         plotting.plot_trace(identifier, xmax=num_epochs, dp=dp)
