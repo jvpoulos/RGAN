@@ -1,11 +1,14 @@
 import numpy as np
 import pandas as pd
+import pickle as pkl
 import pdb
 import re
 from time import time
 import json
 import random
 import os
+ 
+import sys  
 
 import model
 import paths
@@ -19,6 +22,11 @@ from math import ceil
 
 from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.preprocessing import MinMaxScaler
+
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
 
 # --- to do with loading --- #
 def get_samples_and_labels(settings):
@@ -94,7 +102,7 @@ def get_samples_and_labels(settings):
             # this is already one-hot!
 
     if 'predict_labels' in settings and settings['predict_labels']:
-        samples, labels = data_utils.make_predict_labels(samples, labels)
+        samples, labels = make_predict_labels(samples, labels)
         print('Setting cond_dim to 0 from', settings['cond_dim'])
         settings['cond_dim'] = 0
 
@@ -133,6 +141,8 @@ def get_data(data_type, data_options=None):
         samples, pdf = linear(**data_options)
     elif data_type == 'eICU_task':
         samples, labels = eICU_task()
+    elif data_type == 'basque':
+        samples,labels = basque()        
     elif data_type == 'resampled_eICU':
         samples, labels = resampled_eICU(**data_options)
     else:
@@ -292,6 +302,29 @@ def eICU_task(predict_label=False):
         samples[k] = X.reshape(-1, 16, 4)
     return samples, labels
 
+def basque(n_pre=14):
+    """
+    Load Basque country placebo data
+    """
+    y_train = pd.read_csv("data/basque/treated/basque-y-train.csv") 
+
+    y_test = pd.read_csv("data/basque/treated/basque-y-test.csv")
+
+    y = np.append(y_train, y_test)
+
+    y = np.reshape(y, (y.shape[0], 1)) 
+
+    y = np.log(y) # take log
+
+    dX, dY = [], []
+    for i in range(len(y)-n_pre):
+        dX.append(y[i:i+n_pre])
+        dY.append(y[i+n_pre])
+    samples = np.array(dX) # num_samples x seq_length x num_signals
+    labels = np.array(dY)
+
+    return samples, labels
+
 def mnist(randomize=False):
     """ Load and serialise """
     try:
@@ -316,6 +349,7 @@ def mnist(randomize=False):
         fixed_permutation = np.random.permutation(28*28)
         samples = train[:, fixed_permutation]
     samples = samples.reshape(-1, 28*28, 1)     # add redundant additional signals
+
     return samples, labels
 
 
@@ -448,6 +482,7 @@ def periodic_kernel(T, f=1.45/30, gamma=7.0, A=0.1):
 
 
 def GP(seq_length=30, num_samples=28*5*100, num_signals=1, scale=0.1, kernel='rbf', **kwargs):
+    seq_length=30
     # the shape of the samples is num_samples x seq_length x num_signals
     samples = np.empty(shape=(num_samples, seq_length, num_signals))
     #T = np.arange(seq_length)/seq_length    # note, between 0 and 1

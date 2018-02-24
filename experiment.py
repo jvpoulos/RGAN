@@ -17,6 +17,11 @@ from mmd import rbf_mmd2, median_pairwise_distance, mix_rbf_mmd2_and_ratio
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
+
 # --- get settings --- #
 # parse command line arguments, or use defaults
 parser = utils.rgan_options_parser()
@@ -154,7 +159,7 @@ dp_trace = open('./experiments/traces/' + identifier + '.dptrace.txt', 'w')
 dp_trace.write('epoch ' + ' eps' .join(map(str, target_eps)) + '\n')
 
 trace = open('./experiments/traces/' + identifier + '.trace.txt', 'w')
-trace.write('epoch time D_loss G_loss mmd2 that pdf real_pdf\n')
+trace.write('epoch time D_loss G_loss pdf real_pdf\n')
 
 # --- train --- #
 train_vars = ['batch_size', 'D_rounds', 'G_rounds', 'use_time', 'seq_length', 
@@ -170,7 +175,7 @@ for epoch in range(num_epochs):
     D_loss_curr, G_loss_curr = model.train_epoch(epoch, samples['train'], labels['train'],
                                         sess, Z, X, CG, CD, CS,
                                         D_loss, G_loss,
-                                        D_solver, G_solver, 
+                                        D_solver, G_solver,
                                         **train_settings)
     # -- eval -- #
 

@@ -10,6 +10,11 @@ from pandas import read_table, read_hdf
 import paths
 from data_utils import scale_data
 
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
+
 def visualise_at_epoch(vis_sample, data, predict_labels, one_hot, epoch,
         identifier, num_epochs, resample_rate_in_min, multivariate_mnist,
         seq_length, labels):
@@ -43,6 +48,7 @@ def visualise_at_epoch(vis_sample, data, predict_labels, one_hot, epoch,
     return True
 
 def save_plot_sample(samples, idx, identifier, n_samples=6, num_epochs=None, ncol=2):
+    print(samples.shape[0])
     assert n_samples <= samples.shape[0]
     assert n_samples % ncol == 0
     sample_length = samples.shape[1]
@@ -55,7 +61,7 @@ def save_plot_sample(samples, idx, identifier, n_samples=6, num_epochs=None, nco
     x_points = np.arange(sample_length)
 
     nrow = int(n_samples/ncol)
-    fig, axarr = plt.subplots(nrow, ncol, sharex=True, figsize=(6, 6))
+    fig, axarr = plt.subplots(nrow, ncol, sharex=True, figsize=(n_samples, n_samples))
     for m in range(nrow):
         for n in range(ncol):
             # first column
@@ -306,30 +312,30 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
     ax_G.tick_params(bottom='off', right='off')
     axarr[0].legend(handles=[d_handle, g_handle], labels=['discriminator', 'generator'])
 
-    # mmd
-    da_mmd = da.loc[:, ['epoch', 'mmd2']].dropna()
-    axarr[1].plot(da_mmd.epoch, da_mmd.mmd2, color='purple')
-    axarr[1].set_ylabel('MMD$^2$')
-    #axarr[1].set_ylim(0.0, 0.04)
+    # # mmd
+    # da_mmd = da.loc[:, ['epoch', 'mmd2']].dropna()
+    # axarr[1].plot(da_mmd.epoch, da_mmd.mmd2, color='purple')
+    # axarr[1].set_ylabel('MMD$^2$')
+    # #axarr[1].set_ylim(0.0, 0.04)
 
-    #ax_that = axarr[1].twinx()
-    #ax_that.plot(da.that)
-    #ax_that.set_ylabel('$\hat{t}$')
-    #ax_that.set_ylim(0, 50)
-    if final:
-        mmd_ticks = [0.01, 0.02, 0.03]
-        axarr[1].get_yaxis().set_ticks(mmd_ticks)
-        for tick in mmd_ticks:
-            axarr[1].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
+    # #ax_that = axarr[1].twinx()
+    # #ax_that.plot(da.that)
+    # #ax_that.set_ylabel('$\hat{t}$')
+    # #ax_that.set_ylim(0, 50)
+    # if final:
+    #     mmd_ticks = [0.01, 0.02, 0.03]
+    #     axarr[1].get_yaxis().set_ticks(mmd_ticks)
+    #     for tick in mmd_ticks:
+    #         axarr[1].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
 
-    # log likelihood
-    da_ll = da.loc[:, ['epoch', 'll', 'real_ll']].dropna()
-    axarr[2].plot(da_ll.epoch, da_ll.ll, color='orange')
-    axarr[2].plot(da_ll.epoch, da_ll.real_ll, color='orange', alpha=0.5)
-    axarr[2].set_ylabel('likelihood')
-    axarr[2].set_xlabel('epoch')
-    axarr[2].set_ylim(-750, 100)
-    #axarr[2].set_ylim(-10000000, 500)
+    # # log likelihood
+    # da_ll = da.loc[:, ['epoch', 'll', 'real_ll']].dropna()
+    # axarr[2].plot(da_ll.epoch, da_ll.ll, color='orange')
+    # axarr[2].plot(da_ll.epoch, da_ll.real_ll, color='orange', alpha=0.5)
+    # axarr[2].set_ylabel('likelihood')
+    # axarr[2].set_xlabel('epoch')
+    # axarr[2].set_ylim(-750, 100)
+    # #axarr[2].set_ylim(-10000000, 500)
     if final:
 #        ll_ticks = [-1.0*1e7, -0.5*1e7, 0]
         ll_ticks = [-500 ,-250, 0]

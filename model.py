@@ -13,6 +13,11 @@ import dp_optimizer
 import sanitizer
 import accountant
 
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
+
 # --- to do with latent space --- #
 
 def sample_Z(batch_size, seq_length, latent_dim, use_time=False, use_noisy_time=False):
