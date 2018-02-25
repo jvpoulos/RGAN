@@ -456,7 +456,6 @@ def invert(settings, epoch, samples, g_tolerance=None, e_tolerance=0.1,
         sess.run(tf.global_variables_initializer())
         error = sess.run(reconstruction_error, feed_dict=fd)
         g_n = sess.run(grad_norm, feed_dict=fd)
-        print(g_n)
         i = 0
         if not n_iter is None:
             while i < n_iter:
@@ -469,7 +468,6 @@ def invert(settings, epoch, samples, g_tolerance=None, e_tolerance=0.1,
                     _ = sess.run(solver, feed_dict=fd)
                     error, g_n = sess.run([reconstruction_error, grad_norm], feed_dict=fd)
                     i += 1
-                    print(error, g_n)
                     if i > max_iter:
                         break
             else:
@@ -477,7 +475,6 @@ def invert(settings, epoch, samples, g_tolerance=None, e_tolerance=0.1,
                     _ = sess.run(solver, feed_dict=fd)
                     error = sess.run(reconstruction_error, feed_dict=fd)
                     i += 1
-                    print(error)
                     if i > max_iter:
                         break
         Zs = sess.run(Z, feed_dict=fd)

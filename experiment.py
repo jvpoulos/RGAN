@@ -170,7 +170,7 @@ train_settings = dict((k, settings[k]) for k in train_vars)
 
 t0 = time()
 best_epoch = 0
-print('epoch\ttime\tD_loss\tG_loss')
+print('epoch\ttime\tD_loss\tG_loss\tpdf\treal_pdf')
 for epoch in range(num_epochs):
     D_loss_curr, G_loss_curr = model.train_epoch(epoch, samples['train'], labels['train'],
                                         sess, Z, X, CG, CD, CS,
@@ -258,12 +258,12 @@ for epoch in range(num_epochs):
     ## print
     t = time() - t0
     try:
-        print('%d\t%.2f\t%.4f\t%.4f\t' % (epoch, t, D_loss_curr, G_loss_curr))
+        print('%d\t%.2f\t%.4f\t%.4f\t\t%.2f\t%.2f' % (epoch, t, D_loss_curr, G_loss_curr, pdf, pdf_real))
     except TypeError:       # pdf are missing (format as strings)
-        print('%d\t%.2f\t%.4f\t%.4f\t' % (epoch, t, D_loss_curr, G_loss_curr))
+        print('%d\t%.2f\t%.4f\t%.4f\t %s\t %s' % (epoch, t, D_loss_curr, G_loss_curr, pdf, pdf_real))
 
     ## save trace
-    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr, mmd2, pdf_sample, pdf_real])) + '\n')
+    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr])) + '\n')
     if epoch % 10 == 0: 
         trace.flush()
         plotting.plot_trace(identifier, xmax=num_epochs, dp=dp)

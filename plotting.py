@@ -276,7 +276,7 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
 
     trace_path = './experiments/traces/' + identifier + '.trace.txt'
     da = read_table(trace_path, sep=' ')
-    nrow = 3
+    nrow = 1
     if dp:
         trace_dp_path = './experiments/traces/' + identifier + '.dptrace.txt'
         da_dp = read_table(trace_dp_path, sep=' ')
@@ -286,8 +286,8 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
     fig, axarr = plt.subplots(nrow, ncol, sharex='col', figsize=(6, 6))
 
     # D_loss
-    d_handle,  = axarr[0].plot(da.epoch, da.D_loss, color='red', label='discriminator')
-    axarr[0].set_ylabel('D loss')
+    d_handle,  = axarr.plot(da.epoch, da.D_loss, color='red', label='discriminator')
+    axarr.set_ylabel('D loss')
 #    axarr[0].set_ylim(0.9, 1.6)
     if final:
         #D_ticks = [1.0, 1.2, 1.5]
@@ -296,7 +296,7 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
         for tick in D_ticks:
             axarr[0].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
     # G loss
-    ax_G = axarr[0].twinx()
+    ax_G = axarr.twinx()
     g_handle,  = ax_G.plot(da.epoch, da.G_loss, color='green', ls='dashed', label='generator')
     ax_G.set_ylabel('G loss')
     if final:
@@ -310,7 +310,7 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
     ax_G.spines["right"].set_visible(False)
     ax_G.spines["left"].set_visible(False)
     ax_G.tick_params(bottom='off', right='off')
-    axarr[0].legend(handles=[d_handle, g_handle], labels=['discriminator', 'generator'])
+    axarr.legend(handles=[d_handle, g_handle], labels=['discriminator', 'generator'])
 
     # # mmd
     # da_mmd = da.loc[:, ['epoch', 'mmd2']].dropna()
@@ -358,24 +358,25 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
             axarr[3].set_xlabel('epoch')
         axarr[3].legend()
 
+    axarr.set_xlabel('Epoch')
+
     # beautify
-    for ax in axarr:
-        #ax.spines["top"].set_visible(True)
-        ax.spines["top"].set_color((0, 0, 0, 0.3))
-        #ax.spines["bottom"].set_visible(False)
-        ax.spines["bottom"].set_color((0, 0, 0, 0.3))
-        #ax.spines["right"].set_visible(False)
-        ax.spines["right"].set_color((0, 0, 0, 0.3))
-        #ax.spines["left"].set_visible(False)
-        ax.spines["left"].set_color((0, 0, 0, 0.3))
-        ax.tick_params(bottom='off', left='off')
-        # make background grey
-    #    ax.set_facecolor((0.96, 0.96, 0.96))
-        ymin, ymax = ax.get_ylim()
-        for x in np.arange(0, xmax+10, 10):
-            ax.plot((x, x), (ymin, ymax), ls='dotted', lw=0.5, color='black', alpha=0.40, zorder=0)
-        ax.set_xlim(-5, xmax)
-        ax.get_yaxis().set_label_coords(-0.11,0.5)
+    #ax.spines["top"].set_visible(True)
+    axarr.spines["top"].set_color((0, 0, 0, 0.3))
+    #ax.spines["bottom"].set_visible(False)
+    axarr.spines["bottom"].set_color((0, 0, 0, 0.3))
+    #ax.spines["right"].set_visible(False)
+    axarr.spines["right"].set_color((0, 0, 0, 0.3))
+    #ax.spines["left"].set_visible(False)
+    axarr.spines["left"].set_color((0, 0, 0, 0.3))
+    axarr.tick_params(bottom='off', left='off')
+    #make background grey
+    axarr.set_facecolor((0.96, 0.96, 0.96))
+    ymin, ymax = axarr.get_ylim()
+    # for x in np.arange(0, xmax+10, 10):
+    #     axarr.plot((x, x), (ymin, ymax), ls='dotted', lw=0.5, color='black', alpha=0.40, zorder=0)
+    axarr.set_xlim(-5, xmax)
+    axarr.get_yaxis().set_label_coords(-0.11,0.5)
 
     # bottom one
 
