@@ -122,6 +122,11 @@ else:
     vis_sample = sess.run(G_sample, feed_dict={Z: vis_Z})
     vis_C = None
 
+# # Print real samples
+#np.savetxt("./experiments/data/test-train.csv", np.squeeze(samples['train']), delimiter=",")
+# np.savetxt("./experiments/data/test-vali.csv", np.squeeze(samples['vali']), delimiter=",")
+# np.savetxt("./experiments/data/test-test.csv", np.squeeze(samples['test']), delimiter=",")
+
 vis_real_indices = np.random.choice(len(samples['vali']), size=6)
 vis_real = np.float32(samples['vali'][vis_real_indices, :, :])
 if not labels['vali'] is None:
@@ -149,8 +154,11 @@ if data == 'mnist':
 elif 'eICU' in data:
     plotting.vis_eICU_patients_downsampled(vis_real, resample_rate_in_min, 
             identifier=identifier + '_real', idx=0)
+elif 'basque' in data:
+    plotting.save_plot_one_sample(vis_real, 0, identifier + '_real', n_samples=1, ncol=1,
+                            num_epochs=num_epochs)
 else:
-    plotting.save_plot_sample(vis_real, 0, identifier + '_real', n_samples=6, 
+    plotting.save_plot_sample(vis_real, 0, identifier + '_real', n_samples=6, ncol=2,
                             num_epochs=num_epochs)
 
 # for dp
@@ -159,7 +167,7 @@ dp_trace = open('./experiments/traces/' + identifier + '.dptrace.txt', 'w')
 dp_trace.write('epoch ' + ' eps' .join(map(str, target_eps)) + '\n')
 
 trace = open('./experiments/traces/' + identifier + '.trace.txt', 'w')
-trace.write('epoch time D_loss G_loss pdf real_pdf\n')
+trace.write('epoch time D_loss G_loss that pdf real_pdf\n')
 
 # --- train --- #
 train_vars = ['batch_size', 'D_rounds', 'G_rounds', 'use_time', 'seq_length', 
@@ -170,13 +178,20 @@ train_settings = dict((k, settings[k]) for k in train_vars)
 
 t0 = time()
 best_epoch = 0
-print('epoch\ttime\tD_loss\tG_loss\tpdf\treal_pdf')
+print('epoch\ttime\tD_loss\tG_loss')
 for epoch in range(num_epochs):
     D_loss_curr, G_loss_curr = model.train_epoch(epoch, samples['train'], labels['train'],
                                         sess, Z, X, CG, CD, CS,
                                         D_loss, G_loss,
                                         D_solver, G_solver,
                                         **train_settings)
+    if 'basque' in data:
+        D_loss_curr, G_loss_curr = model.train_epoch(epoch, samples, labels,
+                                        sess, Z, X, CG, CD, CS,
+                                        D_loss, G_loss,
+                                        D_solver, G_solver,
+                                        **train_settings)
+
     # -- eval -- #
 
     # visualise plots of generated samples, with/without labels
@@ -240,7 +255,7 @@ for epoch in range(num_epochs):
             pdf_real = 'NA'
     else:
         # report nothing this epoch
-        mmd2 = 'NA'
+        # mmd2 = 'NA'
         that = 'NA'
         pdf_sample = 'NA'
         pdf_real = 'NA'
@@ -258,12 +273,12 @@ for epoch in range(num_epochs):
     ## print
     t = time() - t0
     try:
-        print('%d\t%.2f\t%.4f\t%.4f\t\t%.2f\t%.2f' % (epoch, t, D_loss_curr, G_loss_curr, pdf, pdf_real))
+        print('%d\t%.2f\t%.4f\t%.4f' % (epoch, t, D_loss_curr, G_loss_curr))
     except TypeError:       # pdf are missing (format as strings)
-        print('%d\t%.2f\t%.4f\t%.4f\t %s\t %s' % (epoch, t, D_loss_curr, G_loss_curr, pdf, pdf_real))
+        print('%d\t%.2f\t%.4f\t%.4f' % (epoch, t, D_loss_curr, G_loss_curr))
 
     ## save trace
-    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr])) + '\n')
+    trace.write(' '.join(map(str, [epoch, t, D_loss_curr, G_loss_curr, that, pdf_sample, pdf_real])) + '\n')
     if epoch % 10 == 0: 
         trace.flush()
         plotting.plot_trace(identifier, xmax=num_epochs, dp=dp)
@@ -281,17 +296,28 @@ trace.flush()
 plotting.plot_trace(identifier, xmax=num_epochs, dp=dp)
 model.dump_parameters(identifier + '_' + str(epoch), sess)
 
-## after-the-fact evaluation
-#n_test = vali.shape[0]      # using validation set for now TODO
-#n_batches_for_test = floor(n_test/batch_size)
-#n_test_eval = n_batches_for_test*batch_size
-#test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
-#test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
-#for i in range(n_batches_for_test):
-#    test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
-#test_sample = np.float32(test_sample)
-#test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
-## we can only get samples in the size of the batch...
-#heuristic_sigma = median_pairwise_distance(test_real, test_sample)
+
+# after-the-fact evaluation
+vali = samples['vali'] # using validation set for now TODO
+n_test = vali.shape[0]      
+n_batches_for_test = floor(n_test/batch_size)
+n_test_eval = n_batches_for_test*batch_size
+test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+for i in range(n_batches_for_test):
+   test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+test_sample = np.float32(test_sample)
+test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
+
+if 'sine' in data:
+    plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
+
+if 'sine' in data:
+    np.savetxt("./experiments/data/sine_val_real.csv", np.squeeze(test_real), delimiter=",")
+    np.savetxt("./experiments/data/sine_val_sample.csv", np.squeeze(test_sample), delimiter=",")
+
+# #we can only get samples in the size of the batch...
+# heuristic_sigma = median_pairwise_distance(test_real, test_sample)
+# print(heuristic_sigma)
 #test_mmd2, that = sess.run(mix_rbf_mmd2_and_ratio(test_real, test_sample, sigmas=heuristic_sigma, biased=False))
-##print(test_mmd2, that)
+#print(test_mmd2, that)

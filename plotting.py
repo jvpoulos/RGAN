@@ -41,14 +41,36 @@ def visualise_at_epoch(vis_sample, data, predict_labels, one_hot, epoch,
                 resample_rate_in_min,
                 identifier=identifier,
                 idx=epoch)
+    elif 'basque' in data:
+        save_plot_one_sample(vis_sample, epoch, identifier, n_samples=1,
+                num_epochs=num_epochs, ncol=1)
     else:
         save_plot_sample(vis_sample, epoch, identifier, n_samples=6,
-                num_epochs=num_epochs)
+                num_epochs=num_epochs, ncol=2)
 
     return True
 
-def save_plot_sample(samples, idx, identifier, n_samples=6, num_epochs=None, ncol=2):
-    print(samples.shape[0])
+
+def save_plot_one_sample(samples, idx, identifier, n_samples, num_epochs, ncol):
+    assert n_samples <= samples.shape[0]
+    assert n_samples % ncol == 0
+    sample_length = samples.shape[1]
+
+    if not num_epochs is None:
+        col = hsv_to_rgb((1, 1.0*(idx)/num_epochs, 0.8))
+    else:
+        col = 'grey'
+
+    x_points = np.arange(sample_length)
+    fig, axarr = plt.subplots(1, 1, figsize=(2, 2))
+    fig.suptitle(idx)
+    fig.subplots_adjust(hspace = 0.15)
+    fig.savefig("./experiments/plots/" + identifier + "_epoch" + str(idx).zfill(4) + ".png")
+    plt.clf()
+    plt.close()
+    return
+
+def save_plot_sample(samples, idx, identifier, n_samples, num_epochs, ncol):
     assert n_samples <= samples.shape[0]
     assert n_samples % ncol == 0
     sample_length = samples.shape[1]
@@ -235,7 +257,7 @@ def vary_latent_dimension(sample, dimension, n_steps=6):
         samples[n, :, dimension] += deviations[n]
     return samples
 
-def plot_sine_evaluation(real_samples, fake_samples, idx, identifier):
+def plot_sine_evaluation(identifier,real_samples, fake_samples, idx):
     """
     Create histogram of fake (generated) samples frequency, amplitude distribution.
     Also for real samples.
@@ -286,31 +308,31 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
     fig, axarr = plt.subplots(nrow, ncol, sharex='col', figsize=(6, 6))
 
     # D_loss
-    d_handle,  = axarr.plot(da.epoch, da.D_loss, color='red', label='discriminator')
+    d_handle,  = axarr.plot(da.epoch, da.D_loss, color='red', label='D')
     axarr.set_ylabel('D loss')
 #    axarr[0].set_ylim(0.9, 1.6)
     if final:
         #D_ticks = [1.0, 1.2, 1.5]
         D_ticks = [0.5, 1.0, 1.5]
-        axarr[0].get_yaxis().set_ticks(D_ticks)
+        axarr.get_yaxis().set_ticks(D_ticks)
         for tick in D_ticks:
-            axarr[0].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
+            axarr.plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
     # G loss
     ax_G = axarr.twinx()
-    g_handle,  = ax_G.plot(da.epoch, da.G_loss, color='green', ls='dashed', label='generator')
+    g_handle,  = ax_G.plot(da.epoch, da.G_loss, color='green', ls='dashed', label='G')
     ax_G.set_ylabel('G loss')
     if final:
         G_ticks = [2.5, 5]
         ax_G.get_yaxis().set_ticks(G_ticks)
 #        for tick in G_ticks:
-#            axarr[0].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='green', alpha=1.0, zorder=0)
+#            axarr.plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='green', alpha=1.0, zorder=0)
 
     ax_G.spines["top"].set_visible(False)
     ax_G.spines["bottom"].set_visible(False)
     ax_G.spines["right"].set_visible(False)
     ax_G.spines["left"].set_visible(False)
     ax_G.tick_params(bottom='off', right='off')
-    axarr.legend(handles=[d_handle, g_handle], labels=['discriminator', 'generator'])
+    axarr.legend(handles=[d_handle, g_handle], labels=['D', 'G'])
 
     # # mmd
     # da_mmd = da.loc[:, ['epoch', 'mmd2']].dropna()
@@ -330,18 +352,18 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
 
     # # log likelihood
     # da_ll = da.loc[:, ['epoch', 'll', 'real_ll']].dropna()
-    # axarr[2].plot(da_ll.epoch, da_ll.ll, color='orange')
-    # axarr[2].plot(da_ll.epoch, da_ll.real_ll, color='orange', alpha=0.5)
-    # axarr[2].set_ylabel('likelihood')
-    # axarr[2].set_xlabel('epoch')
-    # axarr[2].set_ylim(-750, 100)
-    # #axarr[2].set_ylim(-10000000, 500)
+    # axarr[1].plot(da_ll.epoch, da_ll.ll, color='orange')
+    # axarr[1].plot(da_ll.epoch, da_ll.real_ll, color='orange', alpha=0.5)
+    # axarr[1].set_ylabel('likelihood')
+    # axarr[1].set_xlabel('epoch')
+    # axarr[1].set_ylim(-750, 100)
+    # #axarr[1].set_ylim(-10000000, 500)
     if final:
 #        ll_ticks = [-1.0*1e7, -0.5*1e7, 0]
         ll_ticks = [-500 ,-250, 0]
-        axarr[2].get_yaxis().set_ticks(ll_ticks)
+        axarr[1].get_yaxis().set_ticks(ll_ticks)
         for tick in ll_ticks:
-            axarr[2].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
+            axarr[1].plot((-10, xmax+10), (tick, tick), ls='dotted', lw=0.5, color='black', alpha=0.4, zorder=0)
 
     if dp:
         assert da_dp.columns[0] == 'epoch'
@@ -358,23 +380,13 @@ def plot_trace(identifier, xmax=250, final=False, dp=False):
             axarr[3].set_xlabel('epoch')
         axarr[3].legend()
 
-    axarr.set_xlabel('Epoch')
-
     # beautify
-    #ax.spines["top"].set_visible(True)
     axarr.spines["top"].set_color((0, 0, 0, 0.3))
-    #ax.spines["bottom"].set_visible(False)
     axarr.spines["bottom"].set_color((0, 0, 0, 0.3))
-    #ax.spines["right"].set_visible(False)
     axarr.spines["right"].set_color((0, 0, 0, 0.3))
-    #ax.spines["left"].set_visible(False)
     axarr.spines["left"].set_color((0, 0, 0, 0.3))
     axarr.tick_params(bottom='off', left='off')
-    #make background grey
-    axarr.set_facecolor((0.96, 0.96, 0.96))
     ymin, ymax = axarr.get_ylim()
-    # for x in np.arange(0, xmax+10, 10):
-    #     axarr.plot((x, x), (ymin, ymax), ls='dotted', lw=0.5, color='black', alpha=0.40, zorder=0)
     axarr.set_xlim(-5, xmax)
     axarr.get_yaxis().set_label_coords(-0.11,0.5)
 

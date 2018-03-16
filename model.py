@@ -66,6 +66,7 @@ def train_epoch(epoch, samples, labels, sess, Z, X, CG, CD, CS, D_loss, G_loss, 
     """
     Train generator and discriminator for one epoch.
     """
+    global X_mb    
     for batch_idx in range(0, int(len(samples) / batch_size) - (D_rounds + (cond_dim > 0)*G_rounds), D_rounds + (cond_dim > 0)*G_rounds):
         # update the discriminator
         for d in range(D_rounds):

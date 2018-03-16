@@ -302,7 +302,7 @@ def eICU_task(predict_label=False):
         samples[k] = X.reshape(-1, 16, 4)
     return samples, labels
 
-def basque(n_pre=14):
+def basque(n_pre=14, n_post=29, seq_length=43, num_signals=1):
     """
     Load Basque country placebo data
     """
@@ -320,10 +320,25 @@ def basque(n_pre=14):
     for i in range(len(y)-n_pre):
         dX.append(y[i:i+n_pre])
         dY.append(y[i+n_pre])
-    samples = np.array(dX) # num_samples x seq_length x num_signals
-    labels = np.array(dY)
+    dataX = np.array(dX) # num_samples x seq_length x num_signals
+    dataY = np.array(dY)
 
-    return samples, labels
+    print('X shape', dataX.shape)
+    print('Y shape', dataY.shape)
+
+    labels = dataY
+    samples = dataX
+
+    # convert it into similar format
+    # labels = {'train': dataY, 'vali': dataY, 'test': dataY}
+    # samples = {'train': dataX, 'vali': dataX, 'test': dataX}
+
+    # # reshape
+    # for (k, X) in samples.items():
+    #     samples[k] = X.reshape(-1, seq_length, num_signals)
+    
+    # print('samples re-shaped', samples.shape)
+    return samples, labels  
 
 def mnist(randomize=False):
     """ Load and serialise """

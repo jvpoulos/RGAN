@@ -714,7 +714,7 @@ def NIPS_toy_plot(identifier_rbf, epoch_rbf, identifier_sine, epoch_sine, identi
     #    plotting.nips_plot_rbf(sample, index, 'GAN')
     #    index += 1
     #for sample in np.random.permutation(train_sine)[:n_samples]:
-    #    plotting.nips_plot_sine(sample, index, 'train')
+    #    plotting.save_plot_vary_dimension(sample, index, 'train')
     #    index += 1
     #for sample in samples_sine:
     #    plotting.nips_plot_sine(sample, index, 'GAN')
