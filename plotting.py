@@ -42,8 +42,8 @@ def visualise_at_epoch(vis_sample, data, predict_labels, one_hot, epoch,
                 identifier=identifier,
                 idx=epoch)
     elif 'basque' in data:
-        save_plot_one_sample(vis_sample, epoch, identifier, n_samples=1,
-                num_epochs=num_epochs, ncol=1)
+        save_plot_one_sample(vis_sample, epoch, identifier, n_samples=4,
+                num_epochs=num_epochs, ncol=2)
     else:
         save_plot_sample(vis_sample, epoch, identifier, n_samples=6,
                 num_epochs=num_epochs, ncol=2)

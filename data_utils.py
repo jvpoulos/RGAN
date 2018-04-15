@@ -142,7 +142,7 @@ def get_data(data_type, data_options=None):
     elif data_type == 'eICU_task':
         samples, labels = eICU_task()
     elif data_type == 'basque':
-        samples,labels = basque()        
+        samples = basque()        
     elif data_type == 'resampled_eICU':
         samples, labels = resampled_eICU(**data_options)
     else:
@@ -302,43 +302,29 @@ def eICU_task(predict_label=False):
         samples[k] = X.reshape(-1, 16, 4)
     return samples, labels
 
-def basque(n_pre=14, n_post=29, seq_length=43, num_signals=1):
+def basque(seq_length=43, num_signals=1):
     """
     Load Basque country placebo data
     """
-    y_train = pd.read_csv("data/basque/treated/basque-y-train.csv") 
+    y = pd.read_csv("data/basque/treated/basque-y.csv") 
 
-    y_test = pd.read_csv("data/basque/treated/basque-y-test.csv")
+    y = np.array(y)
 
-    y = np.append(y_train, y_test)
+    samples = y.reshape(-1, seq_length, num_signals)
 
-    y = np.reshape(y, (y.shape[0], 1)) 
-
-    y = np.log(y) # take log
-
-    dX, dY = [], []
-    for i in range(len(y)-n_pre):
-        dX.append(y[i:i+n_pre])
-        dY.append(y[i+n_pre])
-    dataX = np.array(dX) # num_samples x seq_length x num_signals
-    dataY = np.array(dY)
-
-    print('X shape', dataX.shape)
-    print('Y shape', dataY.shape)
-
-    labels = dataY
-    samples = dataX
+    print('samples shape', samples.shape) # num_samples x seq_length x num_signals # (16, 43, 1)
+    #val.index = np.ceil(seq_length*0.1)
 
     # convert it into similar format
     # labels = {'train': dataY, 'vali': dataY, 'test': dataY}
-    # samples = {'train': dataX, 'vali': dataX, 'test': dataX}
+    #samples = {'train': y, 'vali': y, 'test': y}
 
-    # # reshape
+    # reshape
     # for (k, X) in samples.items():
     #     samples[k] = X.reshape(-1, seq_length, num_signals)
     
-    # print('samples re-shaped', samples.shape)
-    return samples, labels  
+    # print('samples re-shaped', samples['train'].shape) # num_samples x seq_length x num_signals # (16, 43, 1)
+    return samples  
 
 def mnist(randomize=False):
     """ Load and serialise """

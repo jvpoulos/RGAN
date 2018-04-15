@@ -155,7 +155,7 @@ elif 'eICU' in data:
     plotting.vis_eICU_patients_downsampled(vis_real, resample_rate_in_min, 
             identifier=identifier + '_real', idx=0)
 elif 'basque' in data:
-    plotting.save_plot_one_sample(vis_real, 0, identifier + '_real', n_samples=1, ncol=1,
+    plotting.save_plot_one_sample(vis_real, 0, identifier + '_real', n_samples=4, ncol=2,
                             num_epochs=num_epochs)
 else:
     plotting.save_plot_sample(vis_real, 0, identifier + '_real', n_samples=6, ncol=2,
@@ -298,23 +298,34 @@ model.dump_parameters(identifier + '_' + str(epoch), sess)
 
 
 # after-the-fact evaluation
-vali = samples['vali'] # using validation set for now TODO
-n_test = vali.shape[0]      
-n_batches_for_test = floor(n_test/batch_size)
-n_test_eval = n_batches_for_test*batch_size
-test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
-test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
-for i in range(n_batches_for_test):
-   test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
-test_sample = np.float32(test_sample)
-test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
-
 if 'sine' in data:
+    vali = samples['vali'] # using validation set for now TODO
+    n_test = vali.shape[0]      
+    n_batches_for_test = floor(n_test/batch_size)
+    n_test_eval = n_batches_for_test*batch_size
+    test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+    test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+    for i in range(n_batches_for_test):
+       test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+    test_sample = np.float32(test_sample)
+    test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
+
     plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
 
-if 'sine' in data:
-    np.savetxt("./experiments/data/sine_val_real.csv", np.squeeze(test_real), delimiter=",")
-    np.savetxt("./experiments/data/sine_val_sample.csv", np.squeeze(test_sample), delimiter=",")
+if 'basque' in data:
+    vali = samples['train'] 
+    n_test = vali.shape[0]      
+    n_batches_for_test = floor(n_test/batch_size)
+    n_test_eval = n_batches_for_test*batch_size
+    test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+    test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+    for i in range(n_batches_for_test):
+       test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+    test_sample = np.float32(test_sample)
+    test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
+
+np.savetxt("./experiments/data/{}_val_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
 
 # #we can only get samples in the size of the batch...
 # heuristic_sigma = median_pairwise_distance(test_real, test_sample)
