@@ -69,7 +69,7 @@ def rgan_options_parser():
             latent dimension 0 to correspond to time')
     parser.add_argument('--WGAN', type=bool, default=False)
     parser.add_argument('--WGAN_clip', type=bool, default=False)
-    parser.add_argument('--shuffle', type=bool, default=True)
+    parser.add_argument('--shuffle', type=bool, default=False)
     parser.add_argument('--wrong_labels', type=bool, default=False, help='augment \
             discriminator loss with real examples with wrong (~shuffled, sort of) labels')
     # options pertaining to evaluation and exploration

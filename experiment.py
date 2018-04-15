@@ -298,34 +298,54 @@ model.dump_parameters(identifier + '_' + str(epoch), sess)
 
 
 # after-the-fact evaluation
-if 'sine' in data:
-    vali = samples['vali'] # using validation set for now TODO
-    n_test = vali.shape[0]      
-    n_batches_for_test = floor(n_test/batch_size)
-    n_test_eval = n_batches_for_test*batch_size
-    test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
-    test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
-    for i in range(n_batches_for_test):
-       test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
-    test_sample = np.float32(test_sample)
-    test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-    plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
+# train
+vali = samples['train'] # using validation set for now TODO
+n_test = vali.shape[0]      
+n_batches_for_test = floor(n_test/batch_size)
+n_test_eval = n_batches_for_test*batch_size
+test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+for i in range(n_batches_for_test):
+   test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+test_sample = np.float32(test_sample)
+test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-if 'basque' in data:
-    vali = samples['train'] 
-    n_test = vali.shape[0]      
-    n_batches_for_test = floor(n_test/batch_size)
-    n_test_eval = n_batches_for_test*batch_size
-    test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
-    test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
-    for i in range(n_batches_for_test):
-       test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
-    test_sample = np.float32(test_sample)
-    test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
+np.savetxt("./experiments/data/{}_train_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+np.savetxt("./experiments/data/{}_train_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+
+# validation
+vali = samples['vali'] # using validation set for now TODO
+n_test = vali.shape[0]      
+n_batches_for_test = floor(n_test/batch_size)
+n_test_eval = n_batches_for_test*batch_size
+test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+for i in range(n_batches_for_test):
+   test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+test_sample = np.float32(test_sample)
+test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
 np.savetxt("./experiments/data/{}_val_real.csv".format(data), np.squeeze(test_real), delimiter=",")
 np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+
+# test
+vali = samples['test'] # using validation set for now TODO
+n_test = vali.shape[0]      
+n_batches_for_test = floor(n_test/batch_size)
+n_test_eval = n_batches_for_test*batch_size
+test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
+test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
+for i in range(n_batches_for_test):
+   test_sample[i*batch_size:(i+1)*batch_size, :, :] = sess.run(G_sample, feed_dict={Z: test_Z[i*batch_size:(i+1)*batch_size]})
+test_sample = np.float32(test_sample)
+test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
+
+np.savetxt("./experiments/data/{}_test_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+np.savetxt("./experiments/data/{}_test_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+
+if 'sine' in data:
+    plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
 
 # #we can only get samples in the size of the batch...
 # heuristic_sigma = median_pairwise_distance(test_real, test_sample)

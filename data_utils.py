@@ -208,7 +208,7 @@ def scale_data(train, vali, test, scale_range=(-1, 1)):
     scaled_test = scaler.transform(test_r).reshape(-1, signal_length, num_signals)
     return scaled_train, scaled_vali, scaled_test
 
-def split(samples, proportions, normalise=False, scale=False, labels=None, random_seed=None):
+def split(samples, proportions, normalise=False, scale=False, shuffle=False, labels=None, random_seed=None):
     """
     Return train/validation/test split.
     """
@@ -221,10 +221,16 @@ def split(samples, proportions, normalise=False, scale=False, labels=None, rando
     n_test = int(ceil(n_total*proportions[2]))
     n_vali = int(n_total - (n_train + n_test))
     # permutation to shuffle the samples
-    shuff = np.random.permutation(n_total)
-    train_indices = shuff[:n_train]
-    vali_indices = shuff[n_train:(n_train + n_vali)]
-    test_indices = shuff[(n_train + n_vali):]
+    if shuffle:
+        shuff = np.random.permutation(n_total)
+        train_indices = shuff[:n_train]
+        vali_indices = shuff[n_train:(n_train + n_vali)]
+        test_indices = shuff[(n_train + n_vali):]
+    else:
+        shuff = np.arange(n_total)
+        train_indices = shuff[:n_train]
+        vali_indices = shuff[n_train:(n_train + n_vali)]
+        test_indices = shuff[(n_train + n_vali):]
     # TODO when we want to scale we can just return the indices
     assert len(set(train_indices).intersection(vali_indices)) == 0
     assert len(set(train_indices).intersection(test_indices)) == 0
@@ -310,9 +316,11 @@ def basque(seq_length=43, num_signals=1):
 
     y = np.array(y)
 
-    samples = y.reshape(-1, seq_length, num_signals)
+   # samples = y.reshape(-1, seq_length, num_signals) # num_samples x seq_length x num_signals # (16, 43, 1)
 
-    print('samples shape', samples.shape) # num_samples x seq_length x num_signals # (16, 43, 1)
+    samples = y.reshape(seq_length, y.shape[1], num_signals) # (43, 16, 1)
+
+    print('samples shape', samples.shape) 
     #val.index = np.ceil(seq_length*0.1)
 
     # convert it into similar format
