@@ -314,13 +314,13 @@ def stock(num_signals=1):
     """
     y = pd.read_csv("experiments/data/returns_no_missing.csv", header=None) 
 
-    y = np.array(y)
+    y = np.transpose(np.array(y)) # N X T
 
     samples = y.reshape(y.shape[0], y.shape[1],num_signals) # the shape of the samples is num_samples x seq_length x num_signals
 
     print('samples shape', samples.shape) 
 
-    return samples  
+    return samples 
 
 def mnist(randomize=False):
     """ Load and serialise """

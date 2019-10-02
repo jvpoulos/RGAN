@@ -32,6 +32,7 @@ Simplest route to running code (Linux/Mac):
 ```
 git clone git@github.com:ratschlab/RGAN.git
 cd RGAN
+mkdir experiments/plots experiments/parameters experiments/traces
 python experiment.py --settings_file test
 ```
 
