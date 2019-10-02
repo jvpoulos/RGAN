@@ -312,11 +312,11 @@ def stock(num_signals=1):
     """
     Load stock data
     """
-    y = pd.read_csv("experiments/data/returns_no_missing.csv") 
+    y = pd.read_csv("experiments/data/returns_no_missing.csv", header=None) 
 
     y = np.array(y)
 
-    samples = y.reshape(y.shape[0], y.shape[1],num_signals)
+    samples = y.reshape(y.shape[0], y.shape[1],num_signals) # the shape of the samples is num_samples x seq_length x num_signals
 
     print('samples shape', samples.shape) 
 
