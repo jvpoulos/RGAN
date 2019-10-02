@@ -140,9 +140,9 @@ def get_data(data_type, data_options=None):
     elif data_type == 'linear':
         samples, pdf = linear(**data_options)
     elif data_type == 'eICU_task':
-        samples, labels = eICU_task()
-    elif data_type == 'basque':
-        samples = basque()        
+        samples, labels = eICU_task()      
+    elif data_type == 'stock':
+        samples = stock()     
     elif data_type == 'resampled_eICU':
         samples, labels = resampled_eICU(**data_options)
     else:
@@ -308,30 +308,18 @@ def eICU_task(predict_label=False):
         samples[k] = X.reshape(-1, 16, 4)
     return samples, labels
 
-def basque(seq_length=43, num_signals=1):
+def stock(num_signals=1):
     """
-    Load Basque country placebo data
+    Load stock data
     """
-    y = pd.read_csv("data/basque/treated/basque-y.csv") 
+    y = pd.read_csv("experiments/data/returns_no_missing.csv") 
 
     y = np.array(y)
 
-   # samples = y.reshape(-1, seq_length, num_signals) # num_samples x seq_length x num_signals # (16, 43, 1)
-
-    samples = y.reshape(seq_length, y.shape[1], num_signals) # (43, 16, 1)
+    samples = y.reshape(y.shape[0], y.shape[1],num_signals)
 
     print('samples shape', samples.shape) 
-    #val.index = np.ceil(seq_length*0.1)
 
-    # convert it into similar format
-    # labels = {'train': dataY, 'vali': dataY, 'test': dataY}
-    #samples = {'train': y, 'vali': y, 'test': y}
-
-    # reshape
-    # for (k, X) in samples.items():
-    #     samples[k] = X.reshape(-1, seq_length, num_signals)
-    
-    # print('samples re-shaped', samples['train'].shape) # num_samples x seq_length x num_signals # (16, 43, 1)
     return samples  
 
 def mnist(randomize=False):
