@@ -302,7 +302,7 @@ model.dump_parameters(identifier + '_' + str(epoch), sess)
 # train
 vali = samples['train'] # using validation set for now TODO
 n_test = vali.shape[0]      
-n_batches_for_test = floor(n_test/batch_size)
+n_batches_for_test = int(floor(n_test/batch_size))
 n_test_eval = n_batches_for_test*batch_size
 test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
 test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
@@ -317,7 +317,7 @@ np.savetxt("./experiments/data/{}_train_sample.csv".format(data), np.squeeze(tes
 # validation
 vali = samples['vali'] # using validation set for now TODO
 n_test = vali.shape[0]      
-n_batches_for_test = floor(n_test/batch_size)
+n_batches_for_test = int(floor(n_test/batch_size))
 n_test_eval = n_batches_for_test*batch_size
 test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
 test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
@@ -332,7 +332,7 @@ np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_
 # test
 vali = samples['test'] # using validation set for now TODO
 n_test = vali.shape[0]      
-n_batches_for_test = floor(n_test/batch_size)
+n_batches_for_test = int(floor(n_test/batch_size))
 n_test_eval = n_batches_for_test*batch_size
 test_sample = np.empty(shape=(n_test_eval, seq_length, num_signals))
 test_Z = model.sample_Z(n_test_eval, seq_length, latent_dim, use_time)
