@@ -18,7 +18,7 @@ python experiment.py --settings_file sine
 
 Here, `experiments/settings/sine.txt` is the settings file for generating sine waves.
 
-![experiments](experiments/sine_animation.gif)
+![experiments](experiments/plots/sine_animation.gif)
 
 ## Files in this Repository
 
