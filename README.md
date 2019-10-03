@@ -12,15 +12,28 @@ Simplest route to running code (Linux/Mac):
 ```
 git clone git@github.com:ratschlab/RGAN.git
 cd RGAN
-mkdir experiments/parameters experiments/traces
+mkdir experiments/parameters experiments/data
 python experiment.py --settings_file sine
 ```
+Here, `experiments/settings/sine.txt` is the settings file for generating sine waves. 
 
-Here, `experiments/settings/sine.txt` is the settings file for generating sine waves.
+Evolution of Discriminator (D) and Generator (G ) training loss:
+
+![experiments](experiments/traces/sine_trace.png)
+
+Random samples of synthetic sine waves generated at each epoch:
 
 ![experiments](experiments/plots/sine-animation.gif)
 
+Random sample of real sine waves:
+
 ![experiments](experiments/plots/sine_real_epoch0000.png)
+
+Frequency and amplitude distributions of real and generated sine waves:
+
+![experiments](experiments/plots/sine_eval0000.png)
+
+.csv files of real and generated sine waves saved to `experiments/data`.
 
 ## Files in this Repository
 
