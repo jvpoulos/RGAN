@@ -6,7 +6,7 @@ Use generative adversarial networks (GANs) to generate real-valued time series. 
 
 Primary dependencies: `tensorflow`, `scipy`, `numpy`, `pandas`. See `requirements.txt` for specific versions. 
 
-This code is tested with Python 2.7.16
+This code is tested on both Python 2.7.16 and Python 3.6.6.
 
 Simplest route to running code (Linux/Mac):
 ```
