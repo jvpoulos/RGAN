@@ -43,13 +43,13 @@ Get MNIST as CSVs here: https://pjreddie.com/projects/mnist-in-csv/
 python experiment.py --settings_file mnistfull
 ```
 
-Evolution of Discriminator (D) and Generator (G ) training loss:
+<!-- Evolution of Discriminator (D) and Generator (G ) training loss:
 
 ![experiments](experiments/traces/mnistfull_trace.png)
 
 Random samples of synthetic MNIST digits generated at each epoch:
 
-![experiments](experiments/plots/mnist-animation.gif)
+![experiments](experiments/plots/mnist-animation.gif) -->
 
 Random sample of real MNIST digits:
 

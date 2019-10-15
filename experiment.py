@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import pickle
 import pdb
 import random
 import json
@@ -311,11 +312,18 @@ for i in range(n_batches_for_test):
 test_sample = np.float32(test_sample)
 test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-set_trace()
-
 if 'sine' in data:
     np.savetxt("./experiments/data/{}_train_real.csv".format(data), np.squeeze(test_real), delimiter=",")
     np.savetxt("./experiments/data/{}_train_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+
+if 'mnist' in data:
+    output = open('./experiments/data/{}_train_real.pkl'.format(data), 'wb')
+    pickle.dump(test_real, output)
+    output.close()
+
+    output = open('./experiments/data/{}_train_sample.pkl'.format(data), 'wb')
+    pickle.dump(test_sample, output)
+    output.close()
 
 # validation
 vali = samples['vali'] # using validation set for now TODO
@@ -332,6 +340,15 @@ test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False)
 if 'sine' in data:
     np.savetxt("./experiments/data/{}_val_real.csv".format(data), np.squeeze(test_real), delimiter=",")
     np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+
+if 'mnist' in data:
+    output = open('./experiments/data/{}_val_real.pkl'.format(data), 'wb')
+    pickle.dump(test_real, output)
+    output.close()
+
+    output = open('./experiments/data/{}_val_sample.pkl'.format(data), 'wb')
+    pickle.dump(test_sample, output)
+    output.close()
 
 # test
 vali = samples['test'] # using validation set for now TODO
@@ -351,6 +368,15 @@ if 'sine' in data:
 
 if 'sine' in data:
     plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
+
+if 'mnist' in data:
+    output = open('./experiments/data/{}_test_real.pkl'.format(data), 'wb')
+    pickle.dump(test_real, output)
+    output.close()
+
+    output = open('./experiments/data/{}_test_sample.pkl'.format(data), 'wb')
+    pickle.dump(test_sample, output)
+    output.close()
 
 # #we can only get samples in the size of the batch...
 # heuristic_sigma = median_pairwise_distance(test_real, test_sample)
