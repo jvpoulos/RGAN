@@ -311,8 +311,11 @@ for i in range(n_batches_for_test):
 test_sample = np.float32(test_sample)
 test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-np.savetxt("./experiments/data/{}_train_real.csv".format(data), np.squeeze(test_real), delimiter=",")
-np.savetxt("./experiments/data/{}_train_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+set_trace()
+
+if 'sine' in data:
+    np.savetxt("./experiments/data/{}_train_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+    np.savetxt("./experiments/data/{}_train_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
 
 # validation
 vali = samples['vali'] # using validation set for now TODO
@@ -326,8 +329,9 @@ for i in range(n_batches_for_test):
 test_sample = np.float32(test_sample)
 test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-np.savetxt("./experiments/data/{}_val_real.csv".format(data), np.squeeze(test_real), delimiter=",")
-np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+if 'sine' in data:
+    np.savetxt("./experiments/data/{}_val_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+    np.savetxt("./experiments/data/{}_val_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
 
 # test
 vali = samples['test'] # using validation set for now TODO
@@ -341,8 +345,9 @@ for i in range(n_batches_for_test):
 test_sample = np.float32(test_sample)
 test_real = np.float32(vali[np.random.choice(n_test, n_test_eval, replace=False), :, :])
 
-np.savetxt("./experiments/data/{}_test_real.csv".format(data), np.squeeze(test_real), delimiter=",")
-np.savetxt("./experiments/data/{}_test_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
+if 'sine' in data:
+    np.savetxt("./experiments/data/{}_test_real.csv".format(data), np.squeeze(test_real), delimiter=",")
+    np.savetxt("./experiments/data/{}_test_sample.csv".format(data), np.squeeze(test_sample), delimiter=",")
 
 if 'sine' in data:
     plotting.plot_sine_evaluation(identifier, real_samples=test_real, fake_samples=test_sample, idx=0)
