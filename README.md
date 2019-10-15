@@ -2,7 +2,7 @@
 
 Use generative adversarial networks (GANs) to generate real-valued time series. The GAN uses RNNs for both encoder and decoder (specifically LSTMs). 
 
-## Example: generating synthetic sine waves
+## Example: sine waves
 
 Primary dependencies: `tensorflow`, `scipy`, `numpy`, `pandas`. See `requirements.txt` for specific versions. 
 
@@ -34,6 +34,26 @@ Frequency and amplitude distributions of real and generated sine waves:
 ![experiments](experiments/plots/sine_eval0000.png)
 
 .csv files of real and generated sine waves saved to `experiments/data`.
+
+## Example: MNIST as a time-series
+
+Get MNIST as CSVs here: https://pjreddie.com/projects/mnist-in-csv/
+
+```
+python experiment.py --settings_file mnistfull
+```
+
+Evolution of Discriminator (D) and Generator (G ) training loss:
+
+![experiments](experiments/traces/mnistfull_trace.png)
+
+Random samples of synthetic MNIST digits generated at each epoch:
+
+![experiments](experiments/plots/mnist-animation.gif)
+
+Random sample of real MNIST digits:
+
+![experiments](experiments/plots/mnistfull_real_epoch0000.png)
 
 ## Files in this Repository
 
